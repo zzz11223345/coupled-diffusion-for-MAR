@@ -50,7 +50,6 @@ class TrainingConfig:
         self.save_interval = 10
         self.output_dir = ""
         
-        # 设备
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
         
         if config_path and os.path.exists(config_path):
@@ -257,7 +256,6 @@ def parse_args():
 
 
 def main():
-    """主函数"""
     args = parse_args()
     
     # 初始化配置

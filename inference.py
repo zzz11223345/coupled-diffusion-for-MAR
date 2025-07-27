@@ -184,11 +184,8 @@ class InferenceEngine:
         os.makedirs(self.config.output_dir, exist_ok=True)
         
         for i, img_tensor in enumerate(images):
-            # 转换为PIL图像
             img_tensor = img_tensor.cpu().clamp(0, 1)
             img = TF.to_pil_image(img_tensor)
-            
-            # 保存图像
             filename = name[i]
             save_path = os.path.join(self.config.output_dir, filename)
             img.save(save_path)
@@ -209,10 +206,8 @@ class InferenceEngine:
             data_name = data["name"]
             print(f"Processing batch {batch_idx + 1}/{len(self.dataloader)}, batch size: {data_ma.shape[0]}")
             
-            # 执行推理
             output = self.inference_batch(data_ma)
             
-            # 保存结果图像
             if self.config.save_images:
                 self.save_batch_images(output, data_name)
             
@@ -245,7 +240,6 @@ def parse_args():
 
 
 def main():
-    """主函数"""
     args = parse_args()
     
     config = InferenceConfig(args.config)
