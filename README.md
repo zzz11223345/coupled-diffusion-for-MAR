@@ -34,7 +34,8 @@ python3 ma_adaptive_merge.py
 * 🚀 Data Preparation: Real-world corrupted image dataset, unpaired uncorrupted image dataset, and paired dataset obtained through synthesis methods.
 * 💡 Training and Inference: The subsequent processes for diffusion model training, noise transformation module training, and inference follow the same pipeline as described above. Custom datasets for data loading can be defined in ./utils/madataset.py.
 
-
+## 📖 Citation
+If you find this work useful for your research, please consider citing:
 ```bibtex
 @ARTICLE{11072804,
   author={Zhang, Zhouzhuo and Yan, Juncheng and Shi, Yuxuan and Cui, Zhiming and Xu, Jun and Shen, Dinggang},
