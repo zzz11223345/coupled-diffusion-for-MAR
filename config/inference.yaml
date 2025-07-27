@@ -1,0 +1,34 @@
+# 数据相关参数
+test_folder: "path/to/test/data"  # 测试数据文件夹路径
+img_size: 256
+batch_size: 16
+num_workers: 8
+
+# 扩散模型参数
+sample_type: 'ddim'
+num_custom_steps: 40
+encoding_steps: 5
+eta: 0.01
+source_model_path: "./ckpt/ma_ema_0.9999_050000.pt"
+target_model_path: "./ckpt/noma_ema_0.9999_050000.pt"
+config_path: "./config/defalut_config.yaml"
+
+# SwinIR参数
+upscale: 1
+window_size: 8
+heights: 256
+widths: 256
+depths: [6, 6, 6, 6]
+embed_dim: 60
+num_heads: [6, 6, 6, 6]
+mlp_ratio: 2
+upsampler: 'pixelshuffledirect'
+img_range: 1.0
+
+# 推理参数
+noise_transform_model_path: "./saves/model_epoch10.pt"
+output_dir: "./output/results"
+save_images: true
+
+# 设备配置
+device: "cuda:0"  # 或 "cpu"

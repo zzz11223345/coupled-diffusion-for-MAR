@@ -1,0 +1,37 @@
+# 数据相关参数
+train_folder: "./nomadata_sys_train"
+img_size: 256
+batch_size: 4
+num_workers: 8
+
+# 扩散模型参数
+sample_type: "ddim"
+num_custom_steps: 40
+encoding_steps: 5
+eta: 0.01
+source_model_path: "./ckpt/ma_ema_0.9999_050000.pt"
+target_model_path: "./ckpt/noma_ema_0.9999_050000.pt"
+config_path: "./config/defalut_config.yaml"
+
+# SwinIR参数
+upscale: 1
+window_size: 8
+heights: 256
+widths: 256
+depths: [6, 6, 6, 6]
+embed_dim: 60
+num_heads: [6, 6, 6, 6]
+mlp_ratio: 2
+upsampler: "pixelshuffledirect"
+img_range: 1.0
+swinir_pretrain_path: "" ##没有路径表示随机初始化
+
+# 训练参数
+num_epochs: 100
+swinir_lr: 1.0e-06
+gen_lr: 0 ##扩散模型不变，只为了传递参数/梯度
+save_interval: 10
+output_dir: "./saves"
+
+# 设备
+device: "cuda:0"
