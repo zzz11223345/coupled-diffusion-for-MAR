@@ -34,5 +34,20 @@ python3 ma_adaptive_merge.py
 * 🚀 Data Preparation: Real-world corrupted image dataset, unpaired uncorrupted image dataset, and paired dataset obtained through synthesis methods.
 * 💡 Training and Inference: The subsequent processes for diffusion model training, noise transformation module training, and inference follow the same pipeline as described above. Custom datasets for data loading can be defined in ./utils/madataset.py.
 
+
+```bibtex
+@ARTICLE{11072804,
+  author={Zhang, Zhouzhuo and Yan, Juncheng and Shi, Yuxuan and Cui, Zhiming and Xu, Jun and Shen, Dinggang},
+  journal={IEEE Transactions on Medical Imaging}, 
+  title={Coupled Diffusion Models for Metal Artifact Reduction of Clinical Dental CBCT Images}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={1-1},
+  keywords={Diffusion models;Dentistry;Noise;Metals;Noise reduction;Mars;Image restoration;Image segmentation;Training;Noise measurement;Metal artifact reduction;coupled diffusion models;noise transformation;MA-adaptive inference},
+  doi={10.1109/TMI.2025.3587131}
+}
+```
+
 ---
 If this project helps you, please give it a ⭐️ for support!
