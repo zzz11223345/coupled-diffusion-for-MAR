@@ -124,12 +124,12 @@ class InferenceEngine:
         self.noise_transform.eval()
         
     def compute_time_sequence(self):
-        if (self.diffusion_model.t_0 + 1) % self.diffusion_model.num_custom_steps == 0:
-            seq_inv = range(0, self.diffusion_model.t_0 + 1, 
-                          (self.diffusion_model.t_0 + 1) // self.diffusion_model.num_custom_steps)
+        if (self.diffusion_model.max_timestep + 1) % self.diffusion_model.num_custom_steps == 0:
+            seq_inv = range(0, self.diffusion_model.max_timestep + 1, 
+                          (self.diffusion_model.max_timestep + 1) // self.diffusion_model.num_custom_steps)
             assert len(seq_inv) == self.diffusion_model.num_custom_steps
         else:
-            seq_inv = np.linspace(0, 1, self.diffusion_model.num_custom_steps) * self.diffusion_model.t_0
+            seq_inv = np.linspace(0, 1, self.diffusion_model.num_custom_steps) * self.diffusion_model.max_timestep
         
         seq_inv = [int(s) for s in list(seq_inv)][:self.diffusion_model.encoding_steps]
         seq_inv_next = ([-1] + list(seq_inv[:-1]))[:self.diffusion_model.encoding_steps]
@@ -159,7 +159,7 @@ class InferenceEngine:
                 t_next = (torch.ones(batch_size) * j).to(self.device)
                 
                 if it < self.config.encoding_steps - 1:
-                    eps = eps_list[:, it]
+                    eps = eps_list[:, it+1]
                 else:
                     eps = torch.randn_like(x)
                 

@@ -31,7 +31,7 @@ def gather_coefficients(coeff_array, timestep_indices, tensor_shape):
     broadcastable with tensor_shape."""
     batch_size, = timestep_indices.shape
     assert tensor_shape[0] == batch_size
-    gathered_values = torch.gather(torch.tensor(coeff_array, dtype=torch.float, device=timestep_indices.device), 0, timestep_indices.long())
+    gathered_values = torch.gather(coeff_array.to(timestep_indices.device), 0, timestep_indices.long())
     assert gathered_values.shape == (batch_size,)
     reshaped_output = gathered_values.reshape((batch_size,) + (1,) * (len(tensor_shape) - 1))
     return reshaped_output
@@ -218,23 +218,24 @@ class Noise_level(torch.nn.Module):
 
         diffusion_config = setup_ddpm_ddim_config(yaml_config_path)
         
-        self.beta_schedule = create_beta_schedule(
+        beta_schedule_tensor = create_beta_schedule(
             start_beta=diffusion_config.diffusion.beta_start,
             end_beta=diffusion_config.diffusion.beta_end,
             total_timesteps=diffusion_config.diffusion.num_diffusion_timesteps
         )
+        self.register_buffer('beta_schedule', beta_schedule_tensor)
         self.total_timesteps = self.beta_schedule.shape[0]
 
-        alpha_values = 1.0 - self.beta_schedule
+        alpha_values = 1.0 - self.beta_schedule.cpu().numpy() 
         alpha_cumprod_vals = np.cumprod(alpha_values, axis=0)
         alpha_cumprod_prev_vals = np.append(1.0, alpha_cumprod_vals[:-1])
-        posterior_var_vals = self.beta_schedule * (1.0 - alpha_cumprod_prev_vals) / (1.0 - alpha_cumprod_vals)
+        posterior_var_vals = self.beta_schedule.cpu().numpy() * (1.0 - alpha_cumprod_prev_vals) / (1.0 - alpha_cumprod_vals)
     
+        self.sigma_learning = False
+        log_variance_tensor = torch.from_numpy(np.log(np.maximum(posterior_var_vals, 1e-20))).float()
+        self.register_buffer('log_variance', log_variance_tensor)
         self.source_generator = create_model(**Defalut_DICT)
         self.target_model = create_model(**Defalut_DICT)
-        self.sigma_learning = False
-        self.log_variance = np.log(np.maximum(posterior_var_vals, 1e-20))
-
         source_checkpoint = torch.load(source_checkpoint_path)
         target_checkpoint = torch.load(target_checkpoint_path)
         self.target_model.load_state_dict(source_checkpoint)
@@ -262,14 +263,14 @@ class Noise_level(torch.nn.Module):
         clean_image = input_image
         batch_sz = clean_image.shape[0]
 
-        final_timestep = (torch.ones(batch_sz) * (self.encoding_steps - 1)).to(self.cuda_device)
+        final_timestep = (torch.ones(batch_sz) * reverse_sequence[self.encoding_steps - 1]).to(clean_image.device)
         final_noisy_sample = add_noise_to_sample(clean_x0=clean_image, timestep_t=final_timestep, beta_schedule=self.beta_schedule)
         all_noise_estimates = [final_noisy_sample, ]
 
         current_sample = final_noisy_sample
         for iteration_idx, (current_step, next_step) in enumerate(zip(reversed(reverse_sequence), reversed(next_sequence))):
-            current_timestep = (torch.ones(batch_sz) * current_step).to(self.cuda_device)
-            next_timestep = (torch.ones(batch_sz) * next_step).to(self.cuda_device)
+            current_timestep = (torch.ones(batch_sz) * current_step).to(clean_image.device)
+            next_timestep = (torch.ones(batch_sz) * next_step).to(clean_image.device)
 
             if iteration_idx < self.encoding_steps - 1:
                 next_sample = generate_next_sample(
